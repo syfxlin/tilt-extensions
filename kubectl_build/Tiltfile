@@ -28,23 +28,14 @@ def kubectl_build(ref,
                   match_in_env_vars=False,
                   ignore=[],
                   entrypoint=[]):
+    # validate
+    if dockerfile_contents != None and dockerfile != None:
+        fail('Cannot specify both dockerfile and dockerfile_contents keyword arguments')
+
     # command
     command = ['kubectl', 'build']
     # context
     command += ['--context', k8s_context()]
-
-    # dockerfile
-    dockerfile_path = ''
-    if dockerfile_contents != None and dockerfile != None:
-        fail('Cannot specify both dockerfile and dockerfile_contents keyword arguments')
-    elif dockerfile != None:
-        dockerfile_path = dockerfile
-    elif dockerfile_contents != None:
-        command = ['echo', shlex.quote(dockerfile_contents), '|'] + command
-        dockerfile_path = '-'
-    else:
-        dockerfile_path = context + '/Dockerfile'
-    command += ['--file', dockerfile_path]
 
     # namespace
     if namespace:
@@ -94,6 +85,14 @@ def kubectl_build(ref,
     # extra_args
     command += extra_args
 
+    if dockerfile != None:
+        dockerfile_path = dockerfile
+    elif dockerfile_contents != None:
+        dockerfile_path = '-'
+    else:
+        dockerfile_path = context + '/Dockerfile'
+    command += ['--file', dockerfile_path]
+
     command = [shlex.quote(c) for c in command]
     command += ['-t', '$EXPECTED_REF']
     command += [shlex.quote(context)]
@@ -102,6 +101,8 @@ def kubectl_build(ref,
     deps = [context]
     if dockerfile_path != '-':
         deps += [dockerfile_path]
+    else:
+        command = 'echo {} | '.format(shlex.quote(dockerfile_contents)) + command
 
     custom_build(ref=ref,
                  command=command,
