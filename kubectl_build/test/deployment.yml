@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: demo
+  labels:
+    app: demo
+spec:
+  selector:
+    matchLabels:
+      app: demo
+  replicas: 1
+  template:
+    metadata:
+      name: demo
+      labels:
+        app: demo
+    spec:
+      restartPolicy: Always
+      containers:
+        - name: demo
+          image: cr.ixk.me/syfxlin/demo
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 8080
