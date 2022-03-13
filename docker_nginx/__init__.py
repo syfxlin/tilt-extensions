@@ -1,4 +1,6 @@
-dotfile_config = """
+from api import *
+
+dotfile_config_tpl = """
 location ~ /\\. {
   deny all;
   access_log           off;
@@ -7,7 +9,7 @@ location ~ /\\. {
 }
 """
 
-cache_config = """
+cache_config_tpl = """
 location ~* \\.(?:css|js)$ {
   access_log           off;
   log_not_found        off;
@@ -22,13 +24,13 @@ location ~* \\.(?:jpg|jpeg|gif|png|ico|xml|webp|eot|woff|woff2|ttf|svg|otf)$ {
 }
 """
 
-try_file_config = """
+try_file_config_tpl = """
 location / {
   try_files \\$uri \\$uri/ /;
 }
 """
 
-nginx_config = """
+nginx_config_tpl = """
 user  nginx;
 worker_processes  auto;
 
@@ -73,28 +75,48 @@ http {
 }
 """
 
-dockerfile = """
+copy_nginx_config_tpl = """
+COPY --chown=nginx:nginx ./.tilt/nginx /etc/nginx/conf.d
+"""
+
+dockerfile_tpl = """
 FROM nginx:alpine
+
 RUN cat > /etc/nginx/nginx.conf <<EOF
 {nginx_config}
 EOF
+
+{copy_nginx_config}
+
+RUN rm -f /usr/share/nginx/html/*
+COPY --chown=nginx:nginx {root} /usr/share/nginx/html
 """
 
 
-def docker_nginx(dotfile=True,
+def replace_tpl(content,
+                name,
+                tpl,
+                condition=True):
+    name = '{' + name + '}'
+    if condition:
+        return content.replace(name, tpl)
+    else:
+        return content.replace(name, '')
+
+
+def docker_nginx(root='./public',
+                 dotfile=True,
                  cache=True,
                  try_file=True):
-    config = nginx_config
-    if dotfile:
-        config = config.replace('{dotfile_config}', dotfile_config)
-    else:
-        config = config.replace('{dotfile_config}', '')
-    if cache:
-        config = config.replace('{cache_config}', cache_config)
-    else:
-        config = config.replace('{cache_config}', '')
-    if try_file:
-        config = config.replace('{try_file_config}', try_file_config)
-    else:
-        config = config.replace('{try_file_config}', '')
-    return dockerfile.replace('{nginx_config}', config)
+    nginx_config = nginx_config_tpl
+    dockerfile = dockerfile_tpl
+
+    nginx_config = replace_tpl(nginx_config, 'dotfile_config', dotfile_config_tpl, dotfile)
+    nginx_config = replace_tpl(nginx_config, 'cache_config', cache_config_tpl, cache)
+    nginx_config = replace_tpl(nginx_config, 'try_file_config', try_file_config_tpl, try_file)
+
+    dockerfile = replace_tpl(dockerfile, 'root', root)
+    dockerfile = replace_tpl(dockerfile, 'nginx_config', nginx_config)
+    dockerfile = replace_tpl(dockerfile, 'copy_nginx_config', copy_nginx_config_tpl, len(listdir('./.tilt/nginx')) > 0)
+
+    return dockerfile
