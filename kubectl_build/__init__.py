@@ -27,7 +27,7 @@ def kubectl_build(
         ssh=[],                     # type: list[str]
         extra_args=[],              # type: list[str]
         # custom_build args
-        live_update=[],             # type: list[str]
+        live_update=[],             # type: list[LiveUpdateStep]
         match_in_env_vars=False,    # type: bool
         ignore=[],                  # type: list[str]
         entrypoint=[]               # type: list[str]
@@ -108,12 +108,14 @@ def kubectl_build(
     else:
         command = 'echo {} | '.format(shlex.quote(dockerfile_contents)) + command
 
-    custom_build(ref=ref,
-                 command=command,
-                 deps=deps,
-                 live_update=live_update,
-                 match_in_env_vars=match_in_env_vars,
-                 ignore=ignore,
-                 entrypoint=entrypoint,
-                 disable_push=True,
-                 skips_local_docker=True)
+    custom_build(
+        ref=ref,
+        command=command,
+        deps=deps,
+        live_update=live_update,
+        match_in_env_vars=match_in_env_vars,
+        ignore=ignore,
+        entrypoint=entrypoint,
+        disable_push=True,
+        skips_local_docker=True
+    )

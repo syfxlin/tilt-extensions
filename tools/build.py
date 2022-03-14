@@ -14,9 +14,12 @@ def convert(path: str):
     dist_file = open(dist_path, 'w')
     output = ''
 
-    pattern = re.compile('^\s*(import|from)\s+')
+    import_pattern = re.compile('^\s*(import|from)\s+')
+    define_pattern = re.compile('^# define$')
     for line in src_file.readlines():
-        if not pattern.match(line):
+        if define_pattern.match(line):
+            break
+        if not import_pattern.match(line):
             output += line
     dist_file.write(output)
 
