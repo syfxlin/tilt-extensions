@@ -6,6 +6,8 @@ root = os.getcwd()
 
 
 def convert(path: str):
+    if not os.path.isdir(d) or not os.path.exists(os.path.join(d, '__init__.py')):
+        return
     src_path = os.path.join(path, '__init__.py')
     dist_path = os.path.join(path, 'Tiltfile')
     src_file = open(src_path, 'r')
@@ -20,5 +22,9 @@ def convert(path: str):
 
 
 for d in os.listdir(root):
-    if os.path.isdir(d) and os.path.exists(os.path.join(d, '__init__.py')) and d not in ignore:
+    if d not in ignore:
         convert(d)
+
+        test = os.path.join(d, 'test')
+        if os.path.exists(test) and os.path.isdir(test):
+            convert(test)

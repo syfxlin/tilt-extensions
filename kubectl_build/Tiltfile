@@ -1,33 +1,35 @@
 
 
-def kubectl_build(ref,
-                  context='.',
-                  dockerfile=None,
-                  dockerfile_contents=None,
-                  namespace=None,
-                  registry_secret=None,
-                  pull=True,
-                  push=True,
-                  # values
-                  build_args={},
-                  secrets=[],
-                  labels={},
-                  extra_tags=[],
-                  # extra args
-                  cache_from=[],
-                  cache_to=[],
-                  builder=None,
-                  skip_tls_verify=False,
-                  target=None,
-                  user=None,
-                  token=None,
-                  ssh=[],
-                  extra_args=[],
-                  # custom_build args
-                  live_update=[],
-                  match_in_env_vars=False,
-                  ignore=[],
-                  entrypoint=[]):
+def kubectl_build(
+        ref,                        # type: str
+        context='.',                # type: str
+        dockerfile=None,            # type: str | None
+        dockerfile_contents=None,   # type: str | None
+        namespace=None,             # type: str | None
+        registry_secret=None,       # type: str | None
+        pull=True,                  # type: bool
+        push=True,                  # type: bool
+        # values
+        build_args={},              # type: dict[str, str]
+        secrets=[],                 # type: list[str]
+        labels={},                  # type: dict[str, str]
+        extra_tags=[],              # type: list[str]
+        # extra args
+        cache_from=[],              # type: list[str]
+        cache_to=[],                # type: list[str]
+        builder=None,               # type: str | None
+        skip_tls_verify=False,      # type: bool
+        target=None,                # type: str | None
+        user=None,                  # type: str | None
+        token=None,                 # type: str | None
+        ssh=[],                     # type: list[str]
+        extra_args=[],              # type: list[str]
+        # custom_build args
+        live_update=[],             # type: list[str]
+        match_in_env_vars=False,    # type: bool
+        ignore=[],                  # type: list[str]
+        entrypoint=[]               # type: list[str]
+):                                  # type: (...) -> None
     # validate
     if dockerfile_contents != None and dockerfile != None:
         fail('Cannot specify both dockerfile and dockerfile_contents keyword arguments')

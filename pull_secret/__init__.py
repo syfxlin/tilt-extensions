@@ -2,16 +2,17 @@ from api import *
 import os.path
 
 
-def pull_secret(name,
-                namespace=None,
-                from_file=None,
-                from_env=None,
-                from_raw=None):
+def pull_secret(
+        name,               # type: str
+        namespace=None,     # type: str | None
+        from_file=None,     # type: str | None
+        from_env=None,      # type: str | None
+        from_raw=None       # type: str | None
+):                          # type: (...) -> None
     if from_file != None and from_env != None and from_raw != None:
         fail('Cannot specify both from_file and from_env keyword arguments')
 
     command = ['kubectl', 'create', 'secret', 'generic', name]
-    objects = [name, 'secret']
     home = os.environ['HOME']
 
     if from_file != None:
@@ -31,7 +32,5 @@ def pull_secret(name,
 
     if namespace:
         command += ['--namespace', namespace]
-        objects += [namespace]
 
     k8s_yaml(local(command, quiet=True, echo_off=True))
-    k8s_resource(new_name=name, objects=[':'.join(objects)])

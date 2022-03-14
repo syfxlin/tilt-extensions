@@ -2,4 +2,4 @@ FROM busybox
 WORKDIR /app
 ADD ../.. .
 
-CMD ["busybox", "httpd", "-f", "-p", "8080"]
+CMD ["busybox", "httpd", "-f", "-p", "80"]

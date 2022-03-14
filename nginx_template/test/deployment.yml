@@ -15,6 +15,8 @@ spec:
       labels:
         app: demo
     spec:
+      imagePullSecrets:
+        - name: tilt-cr-ixk-me
       restartPolicy: Always
       containers:
         - name: demo
@@ -22,4 +24,4 @@ spec:
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
-              containerPort: 8080
+              containerPort: 80

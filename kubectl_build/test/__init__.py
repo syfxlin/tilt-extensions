@@ -1,6 +1,8 @@
+from kubectl_build import *
+from pull_secret import *
 
-load('../Tiltfile', 'pull_secret')
-load('../../kubectl_build/Tiltfile', 'kubectl_build')
+load('../Tiltfile', 'kubectl_build')
+load('../../pull_secret/Tiltfile', 'pull_secret')
 
 allow_k8s_contexts(['contabo'])
 

@@ -62,7 +62,7 @@ http {
     real_ip_recursive      on;
 
     root                   /usr/share/nginx/html;
-    index                  index.html;
+    index                  {index};
 
     {dotfile_config}
     {cache_config}
@@ -79,7 +79,7 @@ COPY --chown=nginx:nginx ./.tilt/nginx /etc/nginx/conf.d
 """
 
 dockerfile_tpl = """
-FROM nginx:alpine
+FROM nginx:{version}
 
 RUN cat > /etc/nginx/nginx.conf <<EOF
 {nginx_config}
@@ -92,30 +92,45 @@ COPY --chown=nginx:nginx {root} /usr/share/nginx/html
 """
 
 
-def replace_tpl(content,
-                name,
-                tpl,
-                condition=True):
-    name = '{' + name + '}'
-    if condition:
-        return content.replace(name, tpl)
-    else:
-        return content.replace(name, '')
+def replace_tpl(
+        content,        # type: str
+        values={}       # type: dict[str, str | tuple[bool, str] | tuple[bool, str, str]] | list[bool, str] | list[bool, str, str]
+):                      # type: (...) -> str
+    for k, v in values.items():
+        key = '{' + k + '}'
+        if (type(v) == 'tuple' or type(v) == 'list') and len(v) >= 2:
+            if v[0]:
+                value = str(v[1])
+            elif len(v) >= 3 and not v[0]:
+                value = str(v[2])
+            else:
+                value = ''
+        else:
+            value = str(v)
+        content = content.replace(key, value)
+    return content
 
 
-def docker_nginx(root='./public',
-                 dotfile=True,
-                 cache=True,
-                 try_file=True):
-    nginx_config = nginx_config_tpl
-    dockerfile = dockerfile_tpl
-
-    nginx_config = replace_tpl(nginx_config, 'dotfile_config', dotfile_config_tpl, dotfile)
-    nginx_config = replace_tpl(nginx_config, 'cache_config', cache_config_tpl, cache)
-    nginx_config = replace_tpl(nginx_config, 'try_file_config', try_file_config_tpl, try_file)
-
-    dockerfile = replace_tpl(dockerfile, 'root', root)
-    dockerfile = replace_tpl(dockerfile, 'nginx_config', nginx_config)
-    dockerfile = replace_tpl(dockerfile, 'copy_nginx_config', copy_nginx_config_tpl, len(listdir('./.tilt/nginx')) > 0)
-
+def nginx_template(
+        version='alpine',       # type: str
+        root='./public',        # type: str
+        index='index.html',     # type: str
+        dotfile=True,           # type: bool
+        cache=True,             # type: bool
+        try_file=True,          # type: bool
+        inject=[]               # type: list[str]
+):                              # type: (...) -> str
+    nginx_config = replace_tpl(nginx_config_tpl, {
+        'index': index,
+        'dotfile_config': [dotfile, dotfile_config_tpl],
+        'cache_config': [cache, cache_config_tpl],
+        'try_file_config': [try_file, try_file_config_tpl]
+    })
+    dockerfile = replace_tpl(dockerfile_tpl, {
+        'version': version,
+        'root': root,
+        'nginx_config': nginx_config,
+        'copy_nginx_config': [os.path.exists('./.tilt/nginx'), copy_nginx_config_tpl]
+    })
+    dockerfile += '\n'.join(inject)
     return dockerfile

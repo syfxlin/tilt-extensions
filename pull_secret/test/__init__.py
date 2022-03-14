@@ -1,3 +1,5 @@
+from kubectl_build import *
+from pull_secret import *
 
 load('../Tiltfile', 'pull_secret')
 load('../../kubectl_build/Tiltfile', 'kubectl_build')
