@@ -1,14 +1,16 @@
 import api.shlex as shlex
-from api import *
+from write_file import *
+
+load('../write_file/Tiltfile', 'write_file')
 
 
 def kubectl_build(
         ref,                        # type: str
         context='.',                # type: str
-        dockerfile=None,            # type: str | None
-        dockerfile_contents=None,   # type: str | None
-        namespace=None,             # type: str | None
-        registry_secret=None,       # type: str | None
+        dockerfile='',              # type: str
+        dockerfile_contents='',     # type: str
+        namespace='',               # type: str
+        registry_secret='',         # type: str
         pull=True,                  # type: bool
         push=True,                  # type: bool
         # values
@@ -19,11 +21,11 @@ def kubectl_build(
         # extra args
         cache_from=[],              # type: list[str]
         cache_to=[],                # type: list[str]
-        builder=None,               # type: str | None
+        builder='',                 # type: str
         skip_tls_verify=False,      # type: bool
-        target=None,                # type: str | None
-        user=None,                  # type: str | None
-        token=None,                 # type: str | None
+        target='',                  # type: str
+        user='',                    # type: str
+        token='',                   # type: str
         ssh=[],                     # type: list[str]
         extra_args=[],              # type: list[str]
         # custom_build args
@@ -33,7 +35,7 @@ def kubectl_build(
         entrypoint=[]               # type: list[str]
 ):                                  # type: (...) -> None
     # validate
-    if dockerfile_contents != None and dockerfile != None:
+    if dockerfile_contents != '' and dockerfile != '':
         fail('Cannot specify both dockerfile and dockerfile_contents keyword arguments')
 
     # command
@@ -89,9 +91,9 @@ def kubectl_build(
     # extra_args
     command += extra_args
 
-    if dockerfile != None:
+    if dockerfile != '':
         dockerfile_path = dockerfile
-    elif dockerfile_contents != None:
+    elif dockerfile_contents != '':
         dockerfile_path = '-'
     else:
         dockerfile_path = context + '/Dockerfile'
@@ -106,7 +108,7 @@ def kubectl_build(
     if dockerfile_path != '-':
         deps += [dockerfile_path]
     else:
-        command = 'echo {} | '.format(shlex.quote(dockerfile_contents)) + command
+        command += ' < ' + write_file(dockerfile_contents)
 
     custom_build(
         ref=ref,

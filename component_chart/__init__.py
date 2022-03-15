@@ -1,6 +1,6 @@
-from api.tilt_extensions import *
+from helm_create import *
 
-load('ext://helm_remote', 'helm_remote')
+load('../helm_create/Tiltfile', 'helm_create')
 
 
 def component_chart(
@@ -9,15 +9,17 @@ def component_chart(
         version='',                 # type: str
         allow_duplicates=False,     # type: bool
         create_namespace=False,     # type: bool
+        values_contents='',         # type: str
         values=[],                  # type: str | list[str]
         set=[]                      # type: str | list[str]
 ):
-    helm_remote(
-        release_name=name,
+    helm_create(
+        name=name,
         namespace=namespace,
         version=version,
         allow_duplicates=allow_duplicates,
         create_namespace=create_namespace,
+        values_contents=values_contents,
         values=values,
         set=set,
         chart='component-chart',

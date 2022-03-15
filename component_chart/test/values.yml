@@ -1,9 +1,0 @@
-containers:
-  - name: demo
-    image: cr.ixk.me/syfxlin/demo
-service:
-  ports:
-    - name: http
-      port: 80
-pullSecrets:
-  - tilt-cr-ixk-me

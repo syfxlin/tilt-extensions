@@ -36,13 +36,13 @@ worker_processes  auto;
 error_log  /var/log/nginx/error.log warn;
 pid        /var/run/nginx.pid;
 
-events {
+events {{
   worker_connections  1024;
-}
+}}
 
 include /etc/nginx/conf.d/*-root.conf;
 
-http {
+http {{
   server_tokens      off;
   include            /etc/nginx/mime.types;
   default_type       application/octet-stream;
@@ -52,7 +52,7 @@ http {
   tcp_nopush         on;
   port_in_redirect   off;
 
-  server {
+  server {{
     listen 80;
     charset utf-8;
     server_name  _;
@@ -69,9 +69,9 @@ http {
     {try_file_config}
 
     include /etc/nginx/conf.d/*-server.conf;
-  }
+  }}
   include /etc/nginx/conf.d/*-http.conf;
-}
+}}
 """
 
 copy_nginx_config_tpl = """
@@ -92,25 +92,6 @@ COPY --chown=nginx:nginx {root} /usr/share/nginx/html
 """
 
 
-def replace_tpl(
-        content,        # type: str
-        values={}       # type: dict[str, str | tuple[bool, str] | tuple[bool, str, str]] | list[bool, str] | list[bool, str, str]
-):                      # type: (...) -> str
-    for k, v in values.items():
-        key = '{' + k + '}'
-        if (type(v) == 'tuple' or type(v) == 'list') and len(v) >= 2:
-            if v[0]:
-                value = str(v[1])
-            elif len(v) >= 3 and not v[0]:
-                value = str(v[2])
-            else:
-                value = ''
-        else:
-            value = str(v)
-        content = content.replace(key, value)
-    return content
-
-
 def nginx_template(
         version='alpine',       # type: str
         root='./public',        # type: str
@@ -120,17 +101,17 @@ def nginx_template(
         try_file=True,          # type: bool
         inject=[]               # type: list[str]
 ):                              # type: (...) -> str
-    nginx_config = replace_tpl(nginx_config_tpl, {
-        'index': index,
-        'dotfile_config': [dotfile, dotfile_config_tpl],
-        'cache_config': [cache, cache_config_tpl],
-        'try_file_config': [try_file, try_file_config_tpl]
-    })
-    dockerfile = replace_tpl(dockerfile_tpl, {
-        'version': version,
-        'root': root,
-        'nginx_config': nginx_config,
-        'copy_nginx_config': [os.path.exists('./.tilt/nginx'), copy_nginx_config_tpl]
-    })
+    nginx_config = nginx_config_tpl.format(
+        index=index,
+        dotfile_config=dotfile_config_tpl if dotfile else '',
+        cache_config=cache_config_tpl if cache else '',
+        try_file_config=try_file_config_tpl if try_file else ''
+    )
+    dockerfile = dockerfile_tpl.format(
+        version=version,
+        root=root,
+        nginx_config=nginx_config,
+        copy_nginx_config=copy_nginx_config_tpl if os.path.exists('./.tilt/nginx') else ''
+    )
     dockerfile += '\n'.join(inject)
     return dockerfile
