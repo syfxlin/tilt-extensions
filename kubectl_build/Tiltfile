@@ -7,7 +7,7 @@ def kubectl_build(
     context='.',                # type: str
     dockerfile='',              # type: str
     dockerfile_contents='',     # type: str
-    namespace='',               # type: str
+    namespace='kube-system',    # type: str
     registry_secret='',         # type: str
     pull=True,                  # type: bool
     push=True,                  # type: bool
