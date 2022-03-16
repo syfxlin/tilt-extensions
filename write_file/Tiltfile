@@ -1,26 +1,12 @@
 
 
-def write_temp_file(
-    contents            # type: str
-):                      # type: (...) -> str
+def mk_temp():         # type: (...) -> str
     path = str(local(
-        command="""
-            FILENAME=$(mktemp -u)
-            echo "$CONTENTS" > "$FILENAME"
-            echo "$FILENAME"
-        """,
-        command_bat="""
-            @echo off
-            :unique
-            set "FILENAME=%TMP%/tmp.%RANDOM%%RANDOM%"
-            if exist "%FILENAME%" goto :unique
-            echo %CONTENTS% > %FILENAME%
-            echo %FILENAME%
-        """,
-        env={'CONTENTS': contents},
+        command='echo $(mktemp -u)',
+        command_bat='echo %TMP%/tmp.%RANDOM%%RANDOM%',
         quiet=True
-    )).rstrip('\n')
-    watch_settings(ignore=path)
+    )).strip()
+    print(path)
     return path
 
 
@@ -28,13 +14,12 @@ def write_file(
     contents,               # type: str
     path=''                 # type: str
 ):                          # type: (...) -> str
-    if path:
-        local(
-            command='echo "$CONTENTS" > "$FILENAME"',
-            command_bat='echo %CONTENTS% > %FILENAME%',
-            env={'CONTENTS': contents, 'FILENAME': path},
-            quiet=True
-        )
-        return path
-    else:
-        return write_temp_file(contents=contents)
+    if path == '':
+        path = mk_temp()
+    local(
+        command='echo "$CONTENTS" > "$FILENAME"',
+        command_bat='echo %CONTENTS% > %FILENAME%',
+        env={'CONTENTS': contents, 'FILENAME': path},
+        quiet=True
+    )
+    return path

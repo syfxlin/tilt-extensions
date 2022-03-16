@@ -6,7 +6,7 @@ load('../../kubectl_build/Tiltfile', 'kubectl_build')
 load('../../pull_secret/Tiltfile', 'pull_secret')
 load('../Tiltfile', 'nodejs_static_template')
 
-allow_k8s_contexts(['contabo'])
+allow_k8s_contexts(k8s_context())
 
 k8s_yaml('deployment.yml')
 pull_secret('tilt-cr-ixk-me')
