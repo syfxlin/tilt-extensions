@@ -1,57 +1,5 @@
 import os.path
 
-pnpm_copy_tpl = """
-COPY package.json pnpm-lock.yaml ./
-"""
-
-yarn_copy_tpl = """
-COPY package.json yarn.lock ./
-"""
-
-npm_copy_tpl = """
-COPY package*.json ./
-"""
-
-pnpm_install_tpl = """
-RUN pnpm install --prod --frozen-lockfile
-"""
-
-yarn_install_tpl = """
-RUN yarn install --production --frozen-lockfile && yarn cache clean
-"""
-
-npm_install_tpl = """
-RUN npm ci --only=production && npm cache clean --force
-"""
-
-pnpm_build_tpl = """
-RUN pnpm run build
-"""
-
-yarn_build_tpl = """
-RUN yarn run build
-"""
-
-npm_build_tpl = """
-RUN npm run build
-"""
-
-pnpm_start_tpl = """
-CMD ["pnpm", "run", "start"]
-"""
-
-yarn_start_tpl = """
-CMD ["yarn", "run", "start"]
-"""
-
-npm_start_tpl = """
-CMD ["npm", "run", "start"]
-"""
-
-node_start_tpl = """
-CMD ["node", "index.js"]
-"""
-
 dockerfile_tpl = """
 FROM gplane/pnpm:{version}
 
@@ -186,19 +134,19 @@ def nodejs_template(
 ):
     pm_copy = ''
     pm_install = ''
-    pm_start = node_start_tpl
+    pm_start = 'CMD ["node", "index.js"]'
     if os.path.exists('./pnpm-lock.yaml'):
-        pm_copy = pnpm_copy_tpl
-        pm_install = pnpm_install_tpl
-        pm_start = pnpm_start_tpl
+        pm_copy = 'COPY package.json pnpm-lock.yaml ./'
+        pm_install = 'RUN pnpm install --prod --frozen-lockfile'
+        pm_start = 'CMD ["pnpm", "run", "start"]'
     elif os.path.exists('./yarn.lock'):
-        pm_copy = yarn_copy_tpl
-        pm_install = yarn_install_tpl
-        pm_start = yarn_start_tpl
+        pm_copy = 'COPY package.json yarn.lock ./'
+        pm_install = 'RUN yarn install --production --frozen-lockfile && yarn cache clean'
+        pm_start = 'CMD ["yarn", "run", "start"]'
     elif os.path.exists('./package.json'):
-        pm_copy = npm_copy_tpl
-        pm_install = npm_install_tpl
-        pm_start = npm_start_tpl
+        pm_copy = 'COPY package*.json ./'
+        pm_install = 'RUN npm ci --only=production && npm cache clean --force'
+        pm_start = 'CMD ["npm", "run", "start"]'
     if len(cmd) > 0:
         pm_start = 'CMD ["{}"]'.format('", "'.join(cmd))
     dockerfile = dockerfile_tpl.format(
@@ -231,17 +179,17 @@ def nodejs_static_template(
     pm_install = ''
     pm_build = ''
     if os.path.exists('./pnpm-lock.yaml'):
-        pm_copy = pnpm_copy_tpl
-        pm_install = pnpm_install_tpl
-        pm_build = pnpm_build_tpl
+        pm_copy = 'COPY package.json pnpm-lock.yaml ./'
+        pm_install = 'RUN pnpm install --frozen-lockfile'
+        pm_build = 'RUN pnpm run build'
     elif os.path.exists('./yarn.lock'):
-        pm_copy = yarn_copy_tpl
-        pm_install = yarn_install_tpl
-        pm_build = yarn_build_tpl
+        pm_copy = 'COPY package.json yarn.lock ./'
+        pm_install = 'RUN yarn install --frozen-lockfile && yarn cache clean'
+        pm_build = 'RUN yarn run build'
     elif os.path.exists('./package.json'):
-        pm_copy = npm_copy_tpl
-        pm_install = npm_install_tpl
-        pm_build = npm_build_tpl
+        pm_copy = 'COPY package*.json ./'
+        pm_install = 'RUN npm ci && npm cache clean --force'
+        pm_build = 'RUN npm run build'
     nginx_config = nginx_config_tpl.format(
         nginx_index=nginx_index,
         nginx_dotfile_config=dotfile_config_tpl if nginx_dotfile else '',
