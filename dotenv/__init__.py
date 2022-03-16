@@ -3,7 +3,7 @@ import os
 
 
 def dotenv(
-        file='.env'     # type: str
+    file='.env'     # type: str
 ):
     f = read_file(file)
     lines = str(f).splitlines()

@@ -3,35 +3,35 @@ load('../write_file/Tiltfile', 'write_file')
 
 
 def kubectl_build(
-        ref,                        # type: str
-        context='.',                # type: str
-        dockerfile='',              # type: str
-        dockerfile_contents='',     # type: str
-        namespace='',               # type: str
-        registry_secret='',         # type: str
-        pull=True,                  # type: bool
-        push=True,                  # type: bool
-        # values
-        build_args={},              # type: dict[str, str]
-        secrets=[],                 # type: list[str]
-        labels={},                  # type: dict[str, str]
-        extra_tags=[],              # type: list[str]
-        # extra args
-        cache_from=[],              # type: list[str]
-        cache_to=[],                # type: list[str]
-        builder='',                 # type: str
-        skip_tls_verify=False,      # type: bool
-        target='',                  # type: str
-        user='',                    # type: str
-        token='',                   # type: str
-        ssh=[],                     # type: list[str]
-        extra_args=[],              # type: list[str]
-        # custom_build args
-        live_update=[],             # type: list[LiveUpdateStep]
-        match_in_env_vars=False,    # type: bool
-        ignore=[],                  # type: list[str]
-        entrypoint=[]               # type: list[str]
-):                                  # type: (...) -> None
+    ref,                        # type: str
+    context='.',                # type: str
+    dockerfile='',              # type: str
+    dockerfile_contents='',     # type: str
+    namespace='',               # type: str
+    registry_secret='',         # type: str
+    pull=True,                  # type: bool
+    push=True,                  # type: bool
+    # values
+    build_args={},              # type: dict[str, str]
+    secrets=[],                 # type: list[str]
+    labels={},                  # type: dict[str, str]
+    extra_tags=[],              # type: list[str]
+    # extra args
+    cache_from=[],              # type: list[str]
+    cache_to=[],                # type: list[str]
+    builder='',                 # type: str
+    skip_tls_verify=False,      # type: bool
+    target='',                  # type: str
+    user='',                    # type: str
+    token='',                   # type: str
+    ssh=[],                     # type: list[str]
+    extra_args=[],              # type: list[str]
+    # custom_build args
+    live_update=[],             # type: list[LiveUpdateStep]
+    match_in_env_vars=False,    # type: bool
+    ignore=[],                  # type: list[str]
+    entrypoint=[]               # type: list[str]
+):                              # type: (...) -> None
     # validate
     if dockerfile_contents != '' and dockerfile != '':
         fail('Cannot specify both dockerfile and dockerfile_contents keyword arguments')

@@ -2,8 +2,8 @@ from api import *
 
 
 def write_temp_file(
-        contents            # type: str
-):                          # type: (...) -> str
+    contents            # type: str
+):                      # type: (...) -> str
     path = str(local(
         command="""
             FILENAME=$(mktemp -u)
@@ -26,9 +26,9 @@ def write_temp_file(
 
 
 def write_file(
-        contents,               # type: str
-        path=''               # type: str
-):                              # type: (...) -> str
+    contents,               # type: str
+    path=''                 # type: str
+):                          # type: (...) -> str
     if path:
         local(
             command='echo "$CONTENTS" > "$FILENAME"',

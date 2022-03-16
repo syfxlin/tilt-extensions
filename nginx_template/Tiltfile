@@ -89,18 +89,20 @@ EOF
 
 RUN rm -f /usr/share/nginx/html/*
 COPY --chown=nginx:nginx {root} /usr/share/nginx/html
+
+{inject}
 """
 
 
 def nginx_template(
-        version='alpine',       # type: str
-        root='./public',        # type: str
-        index='index.html',     # type: str
-        dotfile=True,           # type: bool
-        cache=True,             # type: bool
-        try_file=True,          # type: bool
-        inject=[]               # type: list[str]
-):                              # type: (...) -> str
+    version='alpine',       # type: str
+    root='./public',        # type: str
+    index='index.html',     # type: str
+    dotfile=True,           # type: bool
+    cache=True,             # type: bool
+    try_file=True,          # type: bool
+    inject=[]               # type: list[str]
+):                          # type: (...) -> str
     nginx_config = nginx_config_tpl.format(
         index=index,
         dotfile_config=dotfile_config_tpl if dotfile else '',
@@ -111,7 +113,7 @@ def nginx_template(
         version=version,
         root=root,
         nginx_config=nginx_config,
-        copy_nginx_config=copy_nginx_config_tpl if os.path.exists('./.tilt/nginx') else ''
+        copy_nginx_config=copy_nginx_config_tpl if os.path.exists('./.tilt/nginx') else '',
+        inject='\n'.join(inject)
     )
-    dockerfile += '\n'.join(inject)
     return dockerfile

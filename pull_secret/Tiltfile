@@ -1,12 +1,12 @@
 
 
 def pull_secret(
-        name,               # type: str
-        namespace='',       # type: str
-        from_file='',       # type: str
-        from_env='',        # type: str
-        from_raw=''         # type: str
-):                          # type: (...) -> None
+    name,               # type: str
+    namespace='',       # type: str
+    from_file='',       # type: str
+    from_env='',        # type: str
+    from_raw=''         # type: str
+):                      # type: (...) -> None
     if from_file != '' and from_env != '' and from_raw != '':
         fail('Cannot specify both from_file and from_env keyword arguments')
 
