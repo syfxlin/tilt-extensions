@@ -38,6 +38,8 @@ def kubectl_build(
     if dockerfile_contents != '' and dockerfile != '':
         fail('Cannot specify both dockerfile and dockerfile_contents keyword arguments')
 
+    # deps
+    deps = [context]
     # command
     command = ['kubectl', 'build']
     # context
@@ -93,22 +95,18 @@ def kubectl_build(
 
     if dockerfile != '':
         dockerfile_path = dockerfile
+        deps += [dockerfile_path]
     elif dockerfile_contents != '':
-        dockerfile_path = '-'
+        dockerfile_path = write_file(dockerfile_contents)
     else:
         dockerfile_path = context + '/Dockerfile'
+        deps += [dockerfile_path]
     command += ['--file', dockerfile_path]
 
     command = [shlex.quote(c) for c in command]
     command += ['-t', '$EXPECTED_REF']
     command += [shlex.quote(context)]
     command = ' '.join(command)
-
-    deps = [context]
-    if dockerfile_path != '-':
-        deps += [dockerfile_path]
-    else:
-        command += ' < ' + write_file(dockerfile_contents)
 
     custom_build(
         ref=ref,

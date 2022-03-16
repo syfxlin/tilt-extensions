@@ -1,4 +1,7 @@
+import os
 from api import *
+
+cwd = os.getcwd()
 
 
 def mk_temp():         # type: (...) -> str
@@ -7,7 +10,6 @@ def mk_temp():         # type: (...) -> str
         command_bat='echo %TMP%/tmp.%RANDOM%%RANDOM%',
         quiet=True
     )).strip()
-    print(path)
     return path
 
 
@@ -18,8 +20,8 @@ def write_file(
     if path == '':
         path = mk_temp()
     local(
-        command='echo "$CONTENTS" > "$FILENAME"',
-        command_bat='echo %CONTENTS% > %FILENAME%',
+        command='sh {}'.format(os.path.join(cwd, 'write_file.sh')),
+        command_bat='powershell.exe {}'.format(os.path.join(cwd, 'write_file.ps1')),
         env={'CONTENTS': contents, 'FILENAME': path},
         quiet=True
     )
