@@ -33,4 +33,4 @@ def pull_secret(
     if namespace:
         command += ['--namespace', namespace]
 
-    k8s_yaml(local(command, quiet=True, echo_off=True))
+    k8s_yaml(local(command=command, quiet=True, echo_off=True))
