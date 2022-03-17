@@ -111,7 +111,7 @@ def kubectl_build(
     custom_build(
         ref=ref,
         command=command,
-        command_bat=command.replace('$EXPECTED_REF', '%EXPECTED_REF%'),
+        command_bat='powershell.exe -NoProfile -Command {}'.format(command.replace('$EXPECTED_REF', '$env:EXPECTED_REF')),
         deps=deps,
         live_update=live_update,
         match_in_env_vars=match_in_env_vars,

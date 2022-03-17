@@ -1,5 +1,6 @@
 from api import *
 import os.path
+import shlex
 
 
 def pull_secret(
@@ -33,4 +34,14 @@ def pull_secret(
     if namespace:
         command += ['--namespace', namespace]
 
-    k8s_yaml(local(command=command, quiet=True, echo_off=True))
+    command = [shlex.quote(c) for c in command]
+    command = ' '.join(command)
+
+    k8s_yaml(local(
+        command=command,
+        command_bat='powershell.exe -NoProfile -Command {}'.format(
+            command.replace('$DOCKER_CONFIG', '$env:DOCKER_CONFIG')
+        ),
+        quiet=True,
+        echo_off=True
+    ))
