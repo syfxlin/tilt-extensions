@@ -43,7 +43,7 @@ def helm_create(
     if kube_version:
         command += ['--kube-version', kube_version]
     if create_namespace:
-        command += ['--create-namespace', create_namespace]
+        command += ['--create-namespace']
     if include_crds:
         command += ['--include-crds']
     if insecure_skip_tls_verify:
