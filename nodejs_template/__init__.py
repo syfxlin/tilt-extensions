@@ -43,7 +43,7 @@ location ~* \\.(?:jpg|jpeg|gif|png|ico|xml|webp|eot|woff|woff2|ttf|svg|otf)$ {
 
 try_file_config_tpl = """
 location / {
-  try_files $uri $uri/ /;
+  try_files \\$uri \\$uri/ /;
 }
 """
 
