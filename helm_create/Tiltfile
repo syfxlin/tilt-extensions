@@ -54,6 +54,6 @@ def helm_create(
         command += ['--password', password]
     command += flags
 
-    yaml = str(local(command, quiet=False))
+    yaml = str(local(command))
     k8s_yaml(yaml, allow_duplicates=allow_duplicates)
     return yaml
