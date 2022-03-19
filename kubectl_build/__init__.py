@@ -27,7 +27,7 @@ def kubectl_build(
     user='',                    # type: str
     token='',                   # type: str
     ssh=[],                     # type: list[str]
-    extra_args=[],              # type: list[str]
+    flags=[],                   # type: list[str]
     # custom_build args
     live_update=[],             # type: list[LiveUpdateStep]
     match_in_env_vars=False,    # type: bool
@@ -90,8 +90,8 @@ def kubectl_build(
     for value in ssh:
         command += ['--ssh', value]
 
-    # extra_args
-    command += extra_args
+    # flags
+    command += flags
 
     if dockerfile != '':
         dockerfile_path = dockerfile

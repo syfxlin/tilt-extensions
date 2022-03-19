@@ -1,6 +1,6 @@
-from helm_create import *
+from helm_template import *
 
-load('../helm_create/Tiltfile', 'helm_create')
+load('../helm_template/Tiltfile', 'helm_template')
 
 
 def component_chart(
@@ -11,16 +11,14 @@ def component_chart(
     namespace='',               # type: str
     version='',                 # type: str
     flags=[],                   # type: list[str]
-    allow_duplicates=False,     # type: bool
 ):
-    helm_create(
+    return helm_template(
         name=name,
         values_contents=values_contents,
         values=values,
         set=set,
         namespace=namespace,
         version=version,
-        allow_duplicates=allow_duplicates,
         chart='component-chart',
         repo='https://charts.devspace.sh',
         api_versions=['networking.k8s.io/v1/Ingress'],

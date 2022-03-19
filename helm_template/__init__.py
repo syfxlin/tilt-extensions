@@ -1,9 +1,10 @@
+from write_file import *
+from api.tilt_extensions import *
 
-load('ext://helm_remote', 'helm_remote')
 load('../write_file/Tiltfile', 'write_file')
 
 
-def helm_create(
+def helm_template(
     name,                               # type: str
     chart,                              # type: str
     version='',                         # type: str
@@ -16,11 +17,10 @@ def helm_create(
     kube_version='',                    # type: str
     create_namespace=True,              # type: bool
     include_crds=True,                  # type: bool
-    insecure_skip_tls_verify=False,     # type: bool
+    skip_tls_verify=False,              # type: bool
     username='',                        # type: str
     password='',                        # type: str
     flags=[],                           # type: list[str]
-    allow_duplicates=False,             # type: bool
 ):
     if values_contents != '':
         if type(values_contents) == 'string':
@@ -46,11 +46,11 @@ def helm_create(
         command += ['--create-namespace']
     if include_crds:
         command += ['--include-crds']
-    if insecure_skip_tls_verify:
+    if skip_tls_verify:
         command += ['--insecure-skip-tls-verify']
     if username:
         command += ['--username', username]
     if password:
         command += ['--password', password]
     command += flags
-    k8s_yaml(local(command), allow_duplicates=allow_duplicates)
+    return local(command)

@@ -96,7 +96,7 @@ COPY --chown=nginx:nginx {root} /usr/share/nginx/html
 
 def nginx_template(
     version='alpine',       # type: str
-    root='./public',        # type: str
+    root='public',          # type: str
     index='index.html',     # type: str
     dotfile=True,           # type: bool
     cache=True,             # type: bool

@@ -33,11 +33,7 @@ func FindRootDir() (string, error) {
 	return "", errors.New("could not find tilt root dir")
 }
 
-func DeleteOldTempFiles() error {
-	root, err := FindRootDir()
-	if err != nil {
-		return err
-	}
+func DeleteOldTempFiles(root string) error {
 	files, err := ioutil.ReadDir(root)
 	if err != nil {
 		return err
@@ -54,7 +50,15 @@ func DeleteOldTempFiles() error {
 }
 
 func main() {
-	err := DeleteOldTempFiles()
+	root := os.Getenv("ROOT_DIR")
+	if root == "" {
+		r, err := FindRootDir()
+		if err != nil {
+			panic(err)
+		}
+		root = r
+	}
+	err := DeleteOldTempFiles(root)
 	if err != nil {
 		panic(err)
 	}
@@ -63,10 +67,6 @@ func main() {
 	contents := os.Getenv("CONTENTS")
 
 	if filename == "" {
-		root, err := FindRootDir()
-		if err != nil {
-			panic(err)
-		}
 		r := rand.New(rand.NewSource(time.Now().UnixNano()))
 		filename = filepath.Join(root, strconv.Itoa(r.Int()))
 	}

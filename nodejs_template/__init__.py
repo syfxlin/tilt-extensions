@@ -168,7 +168,7 @@ def nodejs_static_template(
     inject=[],                  # type: list[str]
     # nginx
     nginx_version='alpine',     # type: str
-    nginx_root='./public',      # type: str
+    nginx_root='public',        # type: str
     nginx_index='index.html',   # type: str
     nginx_dotfile=True,         # type: bool
     nginx_cache=True,           # type: bool

@@ -1,4 +1,8 @@
-from helm_create import *
+from helm_template import *
+from kubectl_build import *
+
+load('../helm_template/Tiltfile', 'helm_template')
+load('../kubectl_build/Tiltfile', 'kubectl_build')
 
 
 def _parse_env(env):
@@ -193,9 +197,12 @@ def _parse_ingress(ingress):
 
 
 def deployment(
+    # base
     name,                       # type: str
     image,                      # type: str
     registry_secret='',         # type: str
+    namespace='',               # type: str
+    # deployment config
     command=[],                 # type: list[str]
     args=[],                    # type: list[str]
     env=[],                     # type: list[list[str]]
@@ -207,10 +214,22 @@ def deployment(
     ingress_config={},          # type: dict[str, str]
     labels={},                  # type: dict[str, str]
     annotations={},             # type: dict[str, str]
-    # other
-    namespace='',               # type: str
-    version='',                 # type: str
-    helm_flags=[],              # type: list[str]
+    # kubectl build config
+    build=True,                 # type: bool
+    context='.',                # type: str
+    dockerfile='',              # type: str
+    dockerfile_contents='',     # type: str
+    build_args={},              # type: dict[str, str]
+    build_secrets=[],           # type: list[str]
+    build_labels={},            # type: dict[str, str]
+    build_tags=[],              # type: list[str]
+    build_flags=[],             # type: list[str]
+    # helm template config
+    deploy=True,                # type: bool
+    deploy_version='',          # type: str
+    deploy_values=[],           # type: list[str]
+    deploy_set=[],              # type: list[str]
+    deploy_flags=[],            # type: list[str]
     allow_duplicates=False,     # type: bool
 ):
     values = {
@@ -248,15 +267,33 @@ def deployment(
     if registry_secret:
         values['pullSecrets'] = [registry_secret]
 
-    helm_create(
+    if build:
+        kubectl_build(
+            ref=image,
+            context=context,
+            dockerfile=dockerfile,
+            dockerfile_contents=dockerfile_contents,
+            registry_secret=registry_secret,
+            build_args=build_args,
+            secrets=build_secrets,
+            labels=build_labels,
+            extra_tags=build_tags,
+            flags=build_flags
+        )
+
+    yaml = helm_template(
         name=name,
         values_contents=values,
         namespace=namespace,
-        version=version,
-        flags=helm_flags,
+        version=deploy_version,
+        values=deploy_values,
+        set=deploy_set,
+        flags=deploy_flags,
         chart='component-chart',
         repo='https://charts.devspace.sh',
         api_versions=['networking.k8s.io/v1/Ingress'],
         kube_version='1.22.7',
-        allow_duplicates=allow_duplicates
     )
+    if deploy:
+        k8s_yaml(yaml, allow_duplicates=allow_duplicates)
+    return yaml
