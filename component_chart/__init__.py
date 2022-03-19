@@ -10,12 +10,9 @@ def component_chart(
     set=[],                     # type: list[str]
     namespace='',               # type: str
     version='',                 # type: str
-    registry_secret='',         # type: str
     flags=[],                   # type: list[str]
     allow_duplicates=False,     # type: bool
 ):
-    if registry_secret:
-        set = set + ['pullSecrets={' + registry_secret + '}']
     helm_create(
         name=name,
         values_contents=values_contents,
