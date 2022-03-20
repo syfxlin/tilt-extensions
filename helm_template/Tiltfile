@@ -2,6 +2,17 @@
 load('../write_file/Tiltfile', 'write_file')
 
 
+def _namespace_inject(
+    x,                                  # type: Blob
+    ns                                  # type: str
+):
+    objects = decode_yaml_stream(x)
+    for o in objects:
+        if type(o) == 'dict' and type(o.get('metadata', None)) == 'dict':
+            o['metadata']['namespace'] = ns
+    return encode_yaml_stream(objects)
+
+
 def helm_template(
     name,                               # type: str
     chart,                              # type: str
@@ -51,4 +62,7 @@ def helm_template(
     if password:
         command += ['--password', password]
     command += flags
-    return local(command)
+    b = local(command)
+    if namespace:
+        b = _namespace_inject(b, namespace)
+    return b
