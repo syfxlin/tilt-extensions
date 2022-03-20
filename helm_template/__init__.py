@@ -64,7 +64,7 @@ def helm_template(
     if password:
         command += ['--password', password]
     command += flags
-    b = local(command)
+    b = local(command, quiet=True)
     if namespace:
         b = _namespace_inject(b, namespace)
     return b
