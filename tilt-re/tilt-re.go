@@ -61,7 +61,7 @@ func tilt(args []string) {
 	src, err := os.Open(filepath.Join(cwd, "Tiltfile.py"))
 	try(err)
 	defer src.Close()
-	dist, err := os.CreateTemp("", "Tiltfile-")
+	dist, err := os.OpenFile(filepath.Join(cwd, "Tiltfile"), os.O_WRONLY|os.O_CREATE, 0755)
 	try(err)
 	defer dist.Close()
 
