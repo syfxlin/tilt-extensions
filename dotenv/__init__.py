@@ -1,5 +1,5 @@
 from api import *
-import os
+from api import os
 
 
 def dotenv(

@@ -1,4 +1,4 @@
-import api.shlex as shlex
+from api import shlex
 from write_file import *
 
 load('../write_file/Tiltfile', 'write_file')
@@ -111,7 +111,9 @@ def kubectl_build(
     custom_build(
         ref=ref,
         command=command,
-        command_bat='powershell.exe -NoProfile -Command {}'.format(command.replace('$EXPECTED_REF', '$env:EXPECTED_REF')),
+        command_bat='powershell.exe -NoProfile -Command {}'.format(
+            command.replace('$EXPECTED_REF', '$env:EXPECTED_REF')
+        ),
         deps=deps,
         live_update=live_update,
         match_in_env_vars=match_in_env_vars,

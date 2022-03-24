@@ -1,5 +1,6 @@
-import os
 from api import *
+from api import os
+from api.os import path
 
 cwd = os.getcwd()
 

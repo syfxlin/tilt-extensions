@@ -1,4 +1,5 @@
-import os.path
+from api import os
+from api.os import path
 
 dotfile_config_tpl = """
 location ~ /\\. {
