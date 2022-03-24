@@ -16,7 +16,7 @@ spec:
         app: demo
     spec:
       imagePullSecrets:
-        - name: tilt-cr-ixk-me
+        - name: cr-ixk-me
       restartPolicy: Always
       containers:
         - name: demo
