@@ -70,6 +70,7 @@ func tilt(args []string) {
 
 	args = append(args, "-f", dist.Name())
 	cmd := exec.Command("tilt", args...)
+	cmd.Dir = cwd
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
