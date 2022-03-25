@@ -2,10 +2,13 @@ package main
 
 import (
 	"bufio"
+	"fmt"
 	"os"
 	"os/exec"
+	"os/signal"
 	"path/filepath"
 	"regexp"
+	"syscall"
 	"time"
 )
 
@@ -18,6 +21,12 @@ func try(err error) {
 func build(src *os.File, dist *os.File) {
 	err := dist.Truncate(0)
 	try(err)
+
+	_, err = src.Seek(0, 0)
+	try(err)
+	_, err = dist.Seek(0, 0)
+	try(err)
+
 	reader := bufio.NewScanner(src)
 	writer := bufio.NewWriter(dist)
 	for reader.Scan() {
@@ -68,7 +77,6 @@ func tilt(args []string) {
 	build(src, dist)
 	watch(src, dist)
 
-	args = append(args, "-f", dist.Name())
 	cmd := exec.Command("tilt", args...)
 	cmd.Dir = cwd
 	cmd.Stdin = os.Stdin
@@ -89,15 +97,21 @@ func convert() {
 	defer dist.Close()
 
 	build(src, dist)
+	watch(src, dist)
+
+	c := make(chan os.Signal, 2)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+
+	fmt.Println("Ctrl-C to exit")
+	<-c
+	fmt.Println("Ctrl-C pressed in Terminal")
 }
 
 func main() {
 	args := os.Args[1:]
-	if args[0] == "up" || args[0] == "down" || args[0] == "ci" {
-		tilt(args)
-	} else if args[0] == "convert" {
+	if args[0] == "watch" {
 		convert()
 	} else {
-		panic("tilt-re only support subcommands in [up, down, ci, convert]")
+		tilt(args)
 	}
 }
