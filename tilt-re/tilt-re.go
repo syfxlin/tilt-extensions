@@ -86,7 +86,7 @@ func tilt(args []string) {
 	try(err)
 }
 
-func convert() {
+func convert(args []string) {
 	cwd, err := os.Getwd()
 	try(err)
 	src, err := os.Open(filepath.Join(cwd, "Tiltfile.py"))
@@ -97,20 +97,22 @@ func convert() {
 	defer dist.Close()
 
 	build(src, dist)
-	watch(src, dist)
 
-	c := make(chan os.Signal, 2)
-	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+	if args[0] == "watch" {
+		watch(src, dist)
+		c := make(chan os.Signal, 2)
+		signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 
-	fmt.Println("Ctrl-C to exit")
-	<-c
-	fmt.Println("Ctrl-C pressed in Terminal")
+		fmt.Println("Ctrl-C to exit")
+		<-c
+		fmt.Println("Ctrl-C pressed in Terminal")
+	}
 }
 
 func main() {
 	args := os.Args[1:]
-	if args[0] == "watch" {
-		convert()
+	if args[0] == "convert" || args[0] == "watch" {
+		convert(args)
 	} else {
 		tilt(args)
 	}
